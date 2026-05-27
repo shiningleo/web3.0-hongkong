@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香港 Wonderland — Web3.0 虚拟经济体</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --hk-red: #C8102E;
+  --hk-gold: #FFE600;
+  --bg-dark: #0D0D1A;
+  --panel-dark: #1A1A2E;
+  --panel-mid: #16213E;
+  --hk-blue: #0F4C75;
+  --neon-cyan: #00E5FF;
+  --neon-pink: #FF006E;
+  --success: #00D26A;
+  --warning: #FFB800;
+  --text: #E8E8E8;
+  --text-dim: #8892A0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--hk-blue); border-radius:3px; }
+
+/* === TOP BAR === */
+.top-bar {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  height:60px;
+  background: linear-gradient(135deg, #0D0D1A 0%, #1A1A2E 100%);
+  border-bottom: 2px solid var(--hk-red);
+  display: flex; align-items:center; padding:0 20px;
+  gap:20px;
+  box-shadow: 0 4px 20px rgba(200,16,46,0.3);
+}
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-size:20px; font-weight:900;
+  background: linear-gradient(90deg, var(--hk-red), var(--hk-gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  white-space:nowrap;
+}
+
+.token-display {
+  display:flex; gap:16px; align-items:center;
+}
+
+.token-box {
+  display:flex; align-items:center; gap:6px;
+  background: var(--panel-mid);
+  border: 1px solid var(--hk-blue);
+  border-radius: 8px; padding:6px 14px;
+  font-size:13px; font-weight:700;
+  transition: all 0.3s;
+}
+
+.token-box:hover { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,229,255,0.3); }
+
+.token-icon { font-size:16px; }
+
+.level-badge {
+  background: linear-gradient(135deg, var(--hk-blue), #1B3A5F);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 8px; padding:5px 12px;
+  font-size:12px; font-weight:700;
+  display:flex; align-items:center; gap:6px;
+}
+
+.xp-bar {
+  width:60px; height:6px;
+  background: var(--bg-dark);
+  border-radius: 3px; overflow:hidden;
+}
+
+.xp-fill { height:100%; background: var(--neon-cyan); border-radius:3px; transition: width 0.5s; }
+
+.nav-tabs {
+  display:flex; gap:4px; margin-left:auto;
+}
+
+.nav-tab {
+  padding:8px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size:13px; font-weight:500;
+  cursor:pointer; transition: all 0.3s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.nav-tab:hover { color: var(--text); background: var(--panel-mid); }
+.nav-tab.active {
+  background: var(--panel-mid);
+  border-color: var(--hk-red);
+  color: var(--hk-gold);
+  box-shadow: 0 0 15px rgba(200,16,46,0.2);
+}
+
+/* === MAIN LAYOUT === */
+.main-container {
+  margin-top: 60px;
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* === LEFT MAP PANEL === */
+.map-panel {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  color: var(--hk-gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.section-title::before {
+  content: '';
+  width: 20px; height: 2px;
+  background: var(--hk-red);
+}
+
+/* === MAP GRID === */
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.landmark-card {
+  background: linear-gradient(145deg, var(--panel-dark), var(--panel-mid));
+  border: 1px solid var(--panel-mid);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.landmark-card::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--hk-red), var(--hk-gold));
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.landmark-card:hover {
+  border-color: var(--neon-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,229,255,0.15);
+}
+
+.landmark-card:hover::before { transform: scaleX(1); }
+
+.landmark-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 8px rgba(255,230,0,0.4));
+}
+
+.landmark-name {
+  font-size: 16px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.landmark-zone {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.landmark-stats {
+  display: flex; justify-content: space-between;
+  align-items: center;
+}
+
+.price-tag {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  color: var(--hk-gold);
+  font-weight: 700;
+}
+
+.share-info {
+  font-size: 12px;
+  color: var(--neon-cyan);
+  display: flex; align-items: center; gap: 4px;
+}
+
+.owned-tag {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--success);
+  color: #000;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px;
+}
+
+/* === RIGHT DETAIL PANEL === */
+.detail-panel {
+  width: 380px;
+  min-width: 380px;
+  background: var(--panel-dark);
+  border-left: 1px solid var(--panel-mid);
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-header {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.detail-icon { font-size: 56px; }
+
+.detail-title { flex: 1; }
+
+.detail-name {
+  font-size: 22px; font-weight: 700;
+  color: var(--hk-gold);
+}
+
+.detail-subtitle {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-card {
+  background: var(--panel-mid);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+.stat-value { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; }
+.stat-value.cyan { color: var(--neon-cyan); }
+.stat-value.gold { color: var(--hk-gold); }
+.stat-value.red { color: var(--hk-red); }
+.stat-value.green { color: var(--success); }
+
+.action-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--hk-red), #E01535);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(200,16,46,0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(200,16,46,0.6);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--panel-mid), #1D2B4F);
+  color: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+}
+
+.btn-secondary:hover {
+  background: rgba(0,229,255,0.1);
+  box-shadow: 0 0 15px rgba(0,229,255,0.3);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #FF8C00, #FFB800);
+  color: #000;
+}
+
+.share-section {
+  background: var(--panel-mid);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.share-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+
+.share-title { font-size: 14px; font-weight: 700; }
+.share-percent { font-size: 13px; color: var(--neon-cyan); }
+
+.share-bar {
+  height: 8px;
+  background: var(--bg-dark);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.share-fill { height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--hk-blue)); border-radius:4px; transition: width 1s; }
+
+.share-prices { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); }
+
+.history-list {
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.history-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--panel-mid);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.history-icon { font-size: 18px; }
+
+.close-btn {
+  position: absolute; top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  background: var(--panel-mid);
+  border: none; border-radius: 8px;
+  color: var(--text-dim); font-size: 18px;
+  cursor: pointer; transition: all 0.3s;
+}
+
+.close-btn:hover { background: var(--hk-red); color: #fff; }
+
+/* === MODAL === */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--panel-dark);
+  border: 1px solid var(--hk-blue);
+  border-radius: 20px;
+  width: 100%; max-width: 480px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 20px;
+  color: var(--hk-gold);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.modal-input {
+  width: 100%; padding: 12px 16px;
+  background: var(--panel-mid);
+  border: 1px solid var(--hk-blue);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.modal-input:focus { border-color: var(--neon-cyan); }
+
+.modal-info {
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--neon-cyan);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.modal-row {
+  display: flex; gap: 12px; margin-bottom: 16px;
+}
+
+.modal-row .modal-input { margin-bottom: 0; }
+
+.btn-row {
+  display: flex; gap: 12px;
+}
+
+.btn-row .action-btn { flex: 1; }
+
+/* === NOTIFICATION === */
+.notifications {
+  position: fixed;
+  top: 80px; right: 20px;
+  z-index: 300;
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
+}
+
+.notif {
+  background: var(--panel-dark);
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14px; font-weight: 500;
+  animation: notifIn 0.4s ease, notifOut 0.4s ease 2.5s forwards;
+  pointer-events: auto;
+  box-shadow: 0 4px 20px rgba(0,229,255,0.2);
+  max-width: 320px;
+}
+
+.notif.success { border-color: var(--success); box-shadow: 0 4px 20px rgba(0,210,106,0.2); }
+.notif.warning { border-color: var(--warning); box-shadow: 0 4px 20px rgba(255,184,0,0.2); }
+.notif.error { border-color: var(--hk-red); box-shadow: 0 4px 20px rgba(200,16,46,0.2); }
+
+.notif-icon { font-size: 22px; flex-shrink: 0; }
+
+@keyframes notifIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes notifOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* === MAYOR PAGE === */
+.page-section { display: none; padding: 20px; flex: 1; overflow-y: auto; }
+.page-section.active { display: flex; flex-direction: column; gap: 16px; }
+
+.mayor-hero {
+  background: linear-gradient(135deg, var(--panel-dark), #1D0A2E);
+  border: 1px solid var(--hk-red);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex; align-items: center; gap: 24px;
+}
+
+.mayor-avatar { font-size: 72px; }
+.mayor-info { flex: 1; }
+.mayor-info h2 { font-size: 24px; color: var(--hk-gold); font-family: 'Orbitron', monospace; }
+.mayor-info p { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
+.mayor-term { font-size: 13px; color: var(--neon-cyan); margin-top: 8px; }
+
+.mayor-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.mayor-action-card {
+  background: var(--panel-mid);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mayor-action-card:hover {
+  border-color: var(--neon-cyan);
+  transform: translateY(-2px);
+}
+
+.mayor-action-icon { font-size: 32px; margin-bottom: 8px; }
+.mayor-action-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.mayor-action-desc { font-size: 12px; color: var(--text-dim); }
+
+.city-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.city-stat {
+  background: var(--panel-dark);
+  border: 1px solid var(--panel-mid);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.city-stat-icon { font-size: 28px; margin-bottom: 6px; }
+.city-stat-val { font-family: 'Orbitron', monospace; font-size: 22px; font-weight: 700; }
+.city-stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+.schedule-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.schedule-item {
+  background: var(--panel-mid);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 14px;
+  font-size: 14px;
+}
+
+.schedule-time {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: var(--neon-cyan);
+  min-width: 50px;
+}
+
+/* === MARKET PAGE === */
+.market-tabs {
+  display: flex; gap: 8px;
+}
+
+.market-tab {
+  padding: 8px 20px;
+  background: var(--panel-dark);
+  border: 1px solid var(--panel-mid);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-size: 13px; cursor: pointer; transition: all 0.3s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.market-tab.active {
+  background: var(--panel-mid);
+  border-color: var(--hk-red);
+  color: var(--hk-gold);
+}
+
+.market-list { display: flex; flex-direction: column; gap: 10px; }
+
+.market-item {
+  background: var(--panel-dark);
+  border: 1px solid var(--panel-mid);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; align-items: center; gap: 16px;
+  transition: all 0.3s;
+}
+
+.market-item:hover { border-color: var(--neon-cyan); }
+
+.market-item-icon { font-size: 36px; }
+.market-item-info { flex: 1; }
+.market-item-name { font-size: 15px; font-weight: 700; }
+.market-item-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.market-item-price { font-family: 'Orbitron', monospace; font-size: 16px; color: var(--hk-gold); }
+.market-item-change { font-size: 11px; color: var(--success); }
+
+/* === PROFILE PAGE === */
+.profile-header {
+  background: linear-gradient(135deg, var(--panel-dark), var(--panel-mid));
+  border: 1px solid var(--hk-blue);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex; align-items: center; gap: 20px;
+}
+
+.profile-avatar { font-size: 64px; }
+.profile-info h2 { font-size: 22px; font-weight: 700; color: var(--hk-gold); }
+.profile-info p { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.profile-stat {
+  background: var(--panel-dark);
+  border: 1px solid var(--panel-mid);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.asset-item {
+  background: var(--panel-dark);
+  border: 1px solid var(--panel-mid);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.asset-item-icon { font-size: 36px; margin-bottom: 6px; }
+.asset-item-name { font-size: 13px; font-weight: 600; }
+.asset-item-shares { font-size: 11px; color: var(--neon-cyan); margin-top: 2px; }
+
+/* === PARTICLES === */
+.particles-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 400;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .detail-panel { display: none; }
+  .profile-stats { grid-template-columns: repeat(3, 1fr); }
+  .city-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .nav-tabs { display: none; }
+  .top-bar { padding:0 12px; gap:10px; }
+  .token-display { gap:8px; }
+  .token-box { padding:5px 10px; font-size:11px; }
+  .map-grid { grid-template-columns: 1fr; }
+  .profile-stats { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo">🏙️ 香港 Wonderland</div>
+  <div class="token-display">
+    <div class="token-box"><span class="token-icon">🪙</span><span id="hkt-balance">1000</span> $HKT</div>
+    <div class="token-box" style="color:var(--neon-cyan)"><span class="token-icon">💠</span><span id="hkd-balance">0</span> $HKD</div>
+    <div class="level-badge">
+      Lv.<span id="player-level">1</span>
+      <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('map')">🗺️ 地图</button>
+    <button class="nav-tab" onclick="showPage('market')">📊 市场</button>
+    <button class="nav-tab" onclick="showPage('mayor')">🏛️ 市长</button>
+    <button class="nav-tab" onclick="showPage('profile')">👤 资产</button>
+  </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="main-container">
+
+  <!-- MAP PAGE -->
+  <div class="page-section active" id="page-map">
+    <div class="section-title">城市地图 — 香港 Wonderland</div>
+    <div class="map-grid" id="landmark-grid"></div>
+  </div>
+
+  <!-- MARKET PAGE -->
+  <div class="page-section" id="page-market">
+    <div class="section-title">NFT 交易所</div>
+    <div class="market-tabs">
+      <button class="market-tab active" onclick="setMarketTab('nft', this)">🏛️ 地标 NFT</button>
+      <button class="market-tab" onclick="setMarketTab('stock', this)">📈 股票市场</button>
+      <button class="market-tab" onclick="setMarketTab('auction', this)">🔨 拍卖行</button>
+    </div>
+    <div id="market-content"></div>
+  </div>
+
+  <!-- MAYOR PAGE -->
+  <div class="page-section" id="page-mayor">
+    <div class="section-title">市政厅</div>
+    <div class="mayor-hero">
+      <div class="mayor-avatar">🏛️</div>
+      <div class="mayor-info">
+        <h2>香港 Wonderland 市政厅</h2>
+        <p>友好市长制度 — 每位市民都有机会成为城市的领导者！</p>
+        <div class="mayor-term" id="mayor-status">当前市长：系统托管中</div>
+      </div>
+    </div>
+    <div class="city-stats">
+      <div class="city-stat">
+        <div class="city-stat-icon">👥</div>
+        <div class="city-stat-val" id="city-pop">3</div>
+        <div class="city-stat-lbl">市民数</div>
+      </div>
+      <div class="city-stat">
+        <div class="city-stat-icon">💰</div>
+        <div class="city-stat-val" id="city-gdp">12,450</div>
+        <div class="city-stat-lbl">城市GDP</div>
+      </div>
+      <div class="city-stat">
+        <div class="city-stat-icon">🌿</div>
+        <div class="city-stat-val" id="city-green">78%</div>
+        <div class="city-stat-lbl">绿化率</div>
+      </div>
+      <div class="city-stat">
+        <div class="city-stat-icon">🎉</div>
+        <div class="city-stat-val" id="city-events">5</div>
+        <div class="city-stat-lbl">本周活动</div>
+      </div>
+    </div>
+    <div class="mayor-actions">
+      <div class="mayor-action-card" onclick="mayorAction('distribute')">
+        <div class="mayor-action-icon">🎁</div>
+        <div class="mayor-action-title">发放市民福利</div>
+        <div class="mayor-action-desc">每位市民获得 $HKT 奖励</div>
+      </div>
+      <div class="mayor-action-card" onclick="mayorAction('event')">
+        <div class="mayor-action-icon">🎪</div>
+        <div class="mayor-action-title">举办文化节</div>
+        <div class="mayor-action-desc">提升城市声望和GDP</div>
+      </div>
+      <div class="mayor-action-card" onclick="mayorAction('green')">
+        <div class="mayor-action-icon">🌳</div>
+        <div class="mayor-action-title">城市绿化</div>
+        <div class="mayor-action-desc">增加绿化率改善环境</div>
+      </div>
+      <div class="mayor-action-card" onclick="mayorAction('tax')">
+        <div class="mayor-action-icon">📉</div>
+        <div class="mayor-action-title">调整税收</div>
+        <div class="mayor-action-desc">促进商业发展吸引投资</div>
+      </div>
+    </div>
+    <div class="section-title" style="margin-top:8px">申请担任市长</div>
+    <div style="background:var(--panel-dark);border:1px solid var(--panel-mid);border-radius:12px;padding:20px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px">🎖️</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px">成为友好市长</div>
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:16px">担任市长一天，管理城市、发放福利、举办活动！</div>
+      <button class="action-btn btn-primary" style="max-width:240px;margin:0 auto" onclick="applyForMayor()">
+        🚀 申请担任市长
+      </button>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:8px" id="mayor-cooldown"></div>
+    </div>
+    <div class="section-title" style="margin-top:8px">近期城市事件</div>
+    <div class="schedule-list" id="city-events-list"></div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page-section" id="page-profile">
+    <div class="profile-header">
+      <div class="profile-avatar">😎</div>
+      <div class="profile-info">
+        <h2 id="profile-name">友好市民</h2>
+        <p id="profile-id">ID: #10001 · 加入于 2026-05-27</p>
+        <p style="font-size:12px;color:var(--neon-cyan);margin-top:4px" id="profile-titles">市民</p>
+      </div>
+    </div>
+    <div class="profile-stats" id="profile-stats"></div>
+    <div class="section-title">我的资产</div>
+    <div class="asset-grid" id="asset-grid"></div>
+    <div class="section-title" style="margin-top:8px">我的持股</div>
+    <div class="asset-grid" id="shares-grid"></div>
+    <div class="section-title" style="margin-top:8px">历史记录</div>
+    <div id="history-list" class="history-list"></div>
+  </div>
+
+  <!-- DETAIL PANEL (slides in from right) -->
+  <div class="detail-panel" id="detail-panel" style="display:none;position:relative;">
+    <button class="close-btn" onclick="closeDetail()">✕</button>
+    <div id="detail-content"></div>
+  </div>
+
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="notifications" id="notifications"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- PARTICLES CANVAS -->
+<canvas class="particles-canvas" id="particles-canvas"></canvas>
+
+<script>
+// ==================== GAME DATA ====================
+const LANDMARKS = [
+  { id:'victoria', name:'维多利亚港', icon:'🌊', zone:'中心商业区', price:5000, gdp:1200, shares:10000, dividend:1.2, owned:false, owner:null, description:'香港最著名的海湾，连接港岛与九龙，夜景璀璨。' },
+  { id:'ifc', name:'国际金融中心', icon:'🏦', zone:'中环', price:12000, gdp:2800, shares:10000, dividend:2.8, owned:false, owner:null, description:'香港最高的地标之一，汇聚全球顶尖金融机构。' },
+  { id:'peak', name:'太平山顶', icon:'⛰️', zone:'山顶区', price:8000, gdp:1800, shares:10000, dividend:1.8, owned:false, owner:null, description:'俯瞰香港全景的最佳位置，乘坐山顶缆车体验经典。' },
+  { id:'lan', name:'兰桂坊', icon:'🍸', zone:'中环', price:6000, gdp:1500, shares:10000, dividend:1.5, owned:false, owner:null, description:'香港最著名的娱乐街区，夜生活与美食天堂。' },
+  { id:'disney', name:'香港迪士尼', icon:'🏰', zone:'大屿山', price:15000, gdp:3500, shares:10000, dividend:3.5, owned:false, owner:null, description:'亚洲最受欢迎的主题乐园之一，童话与冒险的王国。' },
+  { id:'temple', name:'庙街夜市', icon:'🏮', zone:'油麻地', price:3500, gdp:800, shares:10000, dividend:0.8, owned:false, owner:null, description:'充满市井气息的露天市场，传统美食与地道文化。' },
+  { id:'science', name:'香港科学园', icon:'🔬', zone:'白石角', price:9000, gdp:2200, shares:10000, dividend:2.2, owned:false, owner:null, description:'香港创新科技的摇篮，孕育未来独角兽企业。' },
+  { id:'ngongp', name:'昂坪360', icon:'🚠', zone:'大屿山', price:4500, gdp:950, shares:10000, dividend:0.95, owned:false, owner:null, description:'跨越大屿山壮丽山海的缆车之旅，天坛大佛近在眼前。' },
+];
+
+const USER_TITLES = ['市民', '投资者', '地产大亨', '商业巨头', '荣誉市民', '传奇企业家', '香港之光'];
+const MAYOR_ACTIONS = ['distribute', 'event', 'green', 'tax'];
+
+// ==================== GAME STATE ====================
+let state = {
+  player: { name:'友好市民', level:1, xp:0, hkt:1000, hkd:0, mayorCooldown:0 },
+  owned: [],
+  shares: {},
+  transactions: [],
+  city: { gdp:12450, green:78, events:5, mayor:'System', mayorSince:null, history:[] },
+  nextId: 10001,
+};
+
+function loadState() {
+  const s = localStorage.getItem('hk_wonderland');
+  if (s) {
+    try { state = JSON.parse(s); } catch(e) {}
+  }
+  // Fix missing landmark data
+  LANDMARKS.forEach(lm => {
+    const owned = state.owned.find(o => o.id === lm.id);
+    if (owned) lm.owned = true, lm.owner = state.player.name;
+    // Ensure shares exist
+    if (!state.shares[lm.id]) state.shares[lm.id] = 0;
+  });
+}
+
+function saveState() {
+  localStorage.setItem('hk_wonderland', JSON.stringify(state));
+}
+
+// ==================== NOTIFICATIONS ====================
+function notify(msg, type='info', icon='💡') {
+  const el = document.getElementById('notifications');
+  const div = document.createElement('div');
+  div.className = `notif ${type}`;
+  div.innerHTML = `<span class="notif-icon">${icon}</span><span>${msg}</span>`;
+  el.appendChild(div);
+  setTimeout(() => { if (div.parentNode) div.remove(); }, 3200);
+}
+
+function showModal(content) {
+  document.getElementById('modal-content').innerHTML = content;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ==================== PAGE NAVIGATION ====================
+function showPage(page) {
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['map','market','mayor','profile'][i] === page);
+  });
+  if (page === 'market') renderMarket();
+  if (page === 'profile') renderProfile();
+  if (page === 'mayor') renderMayor();
+}
+
+// ==================== RENDER MAP ====================
+function renderMap() {
+  const grid = document.getElementById('landmark-grid');
+  grid.innerHTML = '';
+  LANDMARKS.forEach(lm => {
+    const myShares = state.shares[lm.id] || 0;
+    const div = document.createElement('div');
+    div.className = 'landmark-card';
+    div.innerHTML = `
+      <div class="landmark-icon">${lm.icon}</div>
+      <div class="landmark-name">${lm.name}</div>
+      <div class="landmark-zone">${lm.zone}</div>
+      <div class="landmark-stats">
+        <span class="price-tag">${lm.owned ? '已拥有' : formatNum(lm.price) + ' HKT'}</span>
+        <span class="share-info">📊 ${myShares > 0 ? myShares + '股' : '可入股'}</span>
+      </div>
+      ${lm.owned ? '<div class="owned-tag">✅ 已有</div>' : ''}
+    `;
+    div.onclick = () => showLandmarkDetail(lm);
+    grid.appendChild(div);
+  });
+}
+
+// ==================== DETAIL PANEL ====================
+function showLandmarkDetail(lm) {
+  const panel = document.getElementById('detail-panel');
+  panel.style.display = 'flex';
+  const myShares = state.shares[lm.id] || 0;
+  const sharePercent = (myShares / lm.shares * 100).toFixed(1);
+  const priceChange = ((Math.random()-0.5)*10).toFixed(1);
+  
+  panel.innerHTML = `
+    <button class="close-btn" onclick="closeDetail()">✕</button>
+    <div class="detail-header">
+      <div class="detail-icon">${lm.icon}</div>
+      <div class="detail-title">
+        <div class="detail-name">${lm.name}</div>
+        <div class="detail-subtitle">${lm.zone}</div>
+      </div>
+    </div>
+    <div class="detail-subtitle" style="font-size:13px;color:var(--text-dim);">${lm.description}</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">每日产出</div>
+        <div class="stat-value cyan">+${lm.gdp} HKT</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">股息率</div>
+        <div class="stat-value gold">${lm.dividend}%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">总股数</div>
+        <div class="stat-value">${lm.shares.toLocaleString()}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">当前市长</div>
+        <div class="stat-value green">${state.city.mayor}</div>
+      </div>
+    </div>
+    ${lm.owned ? `
+      <div style="text-align:center;padding:12px;background:rgba(0,210,106,0.1);border:1px solid rgba(0,210,106,0.3);border-radius:8px;font-size:13px;color:var(--success)">
+        ✅ 您已拥有此资产！
+      </div>
+    ` : `
+      <button class="action-btn btn-primary" onclick="buyLandmark('${lm.id}')">
+        🏛️ 购买资产 — ${formatNum(lm.price)} HKT
+      </button>
+    `}
+    <div class="share-section">
+      <div class="share-header">
+        <span class="share-title">我的股份</span>
+        <span class="share-percent">${myShares} 股 (${sharePercent}%)</span>
+      </div>
+      <div class="share-bar"><div class="share-fill" style="width:${sharePercent}%"></div></div>
+      <div class="share-prices">
+        <span>持有: ${myShares} 股</span>
+        <span>市值: ${formatNum(myShares * (lm.price / lm.shares))} HKT</span>
+      </div>
+    </div>
+    <button class="action-btn btn-secondary" onclick="buyShares('${lm.id}')">
+      📈 购买股份 — ${(lm.price / lm.shares).toFixed(2)} HKT/股
+    </button>
+    ${myShares > 0 ? `
+      <button class="action-btn btn-warning" onclick="sellShares('${lm.id}')" style="font-size:13px;padding:10px">
+        💸 出售股份
+      </button>
+    ` : ''}
+    <div class="section-title" style="font-size:12px">近期交易</div>
+    <div class="history-list">${renderHistory(lm.id)}</div>
+  `;
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').style.display = 'none';
+}
+
+function renderHistory(lmId) {
+  const recent = state.transactions.filter(t => t.asset === lmId).slice(-5).reverse();
+  if (!recent.length) return '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:8px">暂无交易记录</div>';
+  return recent.map(t => `
+    <div class="history-item">
+      <span class="history-icon">${t.type === 'buy' ? '📈' : '📉'}</span>
+      <div>
+        <div style="font-weight:600">${t.type === 'buy' ? '买入' : '卖出'}${t.kind === 'asset' ? '资产' : '股份'}</div>
+        <div style="color:var(--text-dim);font-size:11px">${t.amount} × ${formatNum(t.price)} HKT</div>
+      </div>
+      <div style="margin-left:auto;color:var(--text-dim);font-size:11px">${t.time}</div>
+    </div>
+  `).join('');
+}
+
+// ==================== BUY / SELL ====================
+function buyLandmark(id) {
+  const lm = LANDMARKS.find(l => l.id === id);
+  if (state.player.hkt < lm.price) {
+    notify('余额不足！需要 ' + formatNum(lm.price) + ' HKT', 'error', '❌');
+    return;
+  }
+  if (lm.owned) {
+    notify('此资产已被购买！', 'warning', '⚠️');
+    return;
+  }
+  state.player.hkt -= lm.price;
+  lm.owned = true;
+  lm.owner = state.player.name;
+  state.owned.push({ id: id, name: lm.name, price: lm.price });
+  state.transactions.push({ asset: id, type: 'buy', kind: 'asset', amount: 1, price: lm.price, time: new Date().toLocaleString() });
+  addXP(100);
+  saveState();
+  updateUI();
+  showLandmarkDetail(lm);
+  spawnParticles('gold');
+  notify(`🎉 成功购入 ${lm.name}！`, 'success', '🏛️');
+}
+
+function buyShares(id) {
+  const lm = LANDMARKS.find(l => l.id === id);
+  const pricePerShare = lm.price / lm.shares;
+  const maxBuy = Math.min(Math.floor(state.player.hkt / pricePerShare), lm.shares - (state.shares[id] || 0));
+  if (maxBuy <= 0) {
+    notify('余额不足或股份已售完！', 'error', '❌');
+    return;
+  }
+  showModal(`
+    <div class="modal-title">📈 购买股份 — ${lm.name}</div>
+    <div class="modal-info">💡 当前每股价格：${pricePerShare.toFixed(2)} HKT<br>剩余可购：${maxBuy.toLocaleString()} 股</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;color:var(--text-dim);display:block;margin-bottom:6px">购买数量</label>
+      <input class="modal-input" id="share-amount" type="number" min="1" max="${maxBuy}" value="${Math.min(100, maxBuy)}" placeholder="输入购买数量">
+    </div>
+    <div class="btn-row">
+      <button class="action-btn btn-secondary" onclick="closeModal()">取消</button>
+      <button class="action-btn btn-primary" onclick="confirmBuyShares('${id}')">确认购买</button>
+    </div>
+  `);
+}
+
+function confirmBuyShares(id) {
+  const amount = parseInt(document.getElementById('share-amount').value);
+  if (!amount || amount < 1) return;
+  const lm = LANDMARKS.find(l => l.id === id);
+  const pricePerShare = lm.price / lm.shares;
+  const total = Math.round(pricePerShare * amount);
+  if (state.player.hkt < total) {
+    notify('余额不足！', 'error', '❌');
+    return;
+  }
+  state.player.hkt -= total;
+  state.shares[id] = (state.shares[id] || 0) + amount;
+  state.transactions.push({ asset: id, type: 'buy', kind: 'share', amount: amount, price: pricePerShare, time: new Date().toLocaleString() });
+  addXP(amount * 2);
+  saveState();
+  updateUI();
+  closeModal();
+  showLandmarkDetail(lm);
+  spawnParticles('cyan');
+  notify(`📈 购入 ${lm.name} 股份 ${amount} 股！`, 'success', '📊');
+}
+
+function sellShares(id) {
+  const lm = LANDMARKS.find(l => l.id === id);
+  const myShares = state.shares[id] || 0;
+  if (myShares === 0) { notify('您没有此股份！', 'warning', '⚠️'); return; }
+  const pricePerShare = lm.price / lm.shares;
+  showModal(`
+    <div class="modal-title">💸 出售股份 — ${lm.name}</div>
+    <div class="modal-info">💡 当前每股价格：${pricePerShare.toFixed(2)} HKT<br>您持有：${myShares} 股</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;color:var(--text-dim);display:block;margin-bottom:6px">出售数量</label>
+      <input class="modal-input" id="sell-amount" type="number" min="1" max="${myShares}" value="${Math.floor(myShares/2)}" placeholder="输入出售数量">
+    </div>
+    <div class="btn-row">
+      <button class="action-btn btn-secondary" onclick="closeModal()">取消</button>
+      <button class="action-btn btn-warning" onclick="confirmSellShares('${id}')">确认出售</button>
+    </div>
+  `);
+}
+
+function confirmSellShares(id) {
+  const amount = parseInt(document.getElementById('sell-amount').value);
+  if (!amount || amount < 1) return;
+  const lm = LANDMARKS.find(l => l.id === id);
+  const pricePerShare = lm.price / lm.shares;
+  const total = Math.round(pricePerShare * amount);
+  if ((state.shares[id] || 0) < amount) { notify('股份不足！', 'error', '❌'); return; }
+  state.player.hkt += total;
+  state.shares[id] -= amount;
+  state.transactions.push({ asset: id, type: 'sell', kind: 'share', amount: amount, price: pricePerShare, time: new Date().toLocaleString() });
+  addXP(amount);
+  saveState();
+  updateUI();
+  closeModal();
+  showLandmarkDetail(lm);
+  notify(`💸 出售 ${lm.name} 股份 ${amount} 股，获得 ${formatNum(total)} HKT！`, 'success', '💰');
+}
+
+// ==================== MARKET ====================
+let marketTab = 'nft';
+
+function setMarketTab(tab, btn) {
+  marketTab = tab;
+  document.querySelectorAll('.market-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarket();
+}
+
+function renderMarket() {
+  const content = document.getElementById('market-content');
+  if (marketTab === 'nft') {
+    content.innerHTML = `<div class="market-list">${LANDMARKS.map(lm => `
+      <div class="market-item" onclick="showLandmarkDetail(LANDMARKS.find(l=>l.id==='${lm.id}'))">
+        <div class="market-item-icon">${lm.icon}</div>
+        <div class="market-item-info">
+          <div class="market-item-name">${lm.name}</div>
+          <div class="market-item-desc">${lm.description.substring(0,40)}...</div>
+        </div>
+        <div>
+          <div class="market-item-price">${lm.owned ? '已售' : formatNum(lm.price) + ' HKT'}</div>
+          <div class="market-item-change">每日产出 +${lm.gdp} HKT</div>
+        </div>
+      </div>
+    `).join('')}</div>`;
+  } else if (marketTab === 'stock') {
+    content.innerHTML = `<div class="market-list">${LANDMARKS.map(lm => {
+      const myShares = state.shares[lm.id] || 0;
+      const pricePerShare = lm.price / lm.shares;
+      const change = ((Math.random()-0.3)*8).toFixed(1);
+      const totalShares = LANDMARKS.reduce((s, l) => s + (state.shares[l.id] || 0), 0);
+      return `
+      <div class="market-item">
+        <div class="market-item-icon">${lm.icon}</div>
+        <div class="market-item-info">
+          <div class="market-item-name">${lm.name} — 股票</div>
+          <div class="market-item-desc">总股本 ${lm.shares.toLocaleString()} 股 | 已发行 ${((totalShares / (lm.shares * LANDMARKS.length)) * 100).toFixed(1)}%</div>
+        </div>
+        <div>
+          <div class="market-item-price">${pricePerShare.toFixed(2)} HKT</div>
+          <div class="market-item-change" style="color:${change>=0?'var(--success)':'var(--hk-red)'}">${change>=0?'↑':'↓'} ${Math.abs(change)}%</div>
+        </div>
+        ${myShares > 0 ? `<span style="font-size:11px;color:var(--success)">持有 ${myShares} 股</span>` : ''}
+      </div>
+    `}).join('')}</div>`;
+  } else if (marketTab === 'auction') {
+    const items = [
+      { name:'维多利亚港 · 黄金版', icon:'🌊', price:50000, desc:'稀有NFT，全球限量1个', bids:7 },
+      { name:'中银大厦 · 钻石版', icon:'🏦', price:35000, desc:'特别版地标NFT', bids:4 },
+      { name:'迪士尼 · 传奇版', icon:'🏰', price:28000, desc:'附带特殊股息特权', bids:12 },
+    ];
+    content.innerHTML = `<div class="market-list">${items.map(item => `
+      <div class="market-item" style="border-color:var(--warning)">
+        <div class="market-item-icon">${item.icon}</div>
+        <div class="market-item-info">
+          <div class="market-item-name" style="color:var(--warning)">${item.name}</div>
+          <div class="market-item-desc">${item.desc} · ${item.bids}次出价</div>
+        </div>
+        <div>
+          <div class="market-item-price" style="color:var(--warning)">${formatNum(item.price)} HKT</div>
+          <button class="action-btn btn-warning" style="padding:6px 12px;font-size:12px" onclick="notify('拍卖功能即将上线！', 'info', '🔨')">出价</button>
+        </div>
+      </div>
+    `).join('')}</div>`;
+  }
+}
+
+// ==================== MAYOR ====================
+function renderMayor() {
+  document.getElementById('mayor-status').textContent = 
+    `当前市长：${state.city.mayor === state.player.name ? '您！🎖️' : state.city.mayor}`;
+  document.getElementById('city-gdp').textContent = formatNum(state.city.gdp);
+  document.getElementById('city-green').textContent = state.city.green + '%';
+  document.getElementById('city-events').textContent = state.city.events;
+  document.getElementById('city-pop').textContent = Object.keys(state.owned).length + 3;
+  
+  // Cooldown
+  if (state.player.mayorCooldown > 0) {
+    const hrs = Math.ceil(state.player.mayorCooldown / 3600000);
+    document.getElementById('mayor-cooldown').textContent = `⏳ 需等待 ${hrs} 小时后才能再次申请`;
+  } else {
+    document.getElementById('mayor-cooldown').textContent = '✅ 可以申请';
+  }
+  
+  // Events
+  const list = document.getElementById('city-events-list');
+  const events = [
+    { time:'09:00', icon:'🎉', text:'维多利亚港烟花汇演', type:'event' },
+    { time:'14:00', icon:'🏛️', text:'中环金融论坛开幕', type:'finance' },
+    { time:'18:00', icon:'🍜', text:'庙街美食节进行中', type:'food' },
+    { time:'20:00', icon:'🎭', text:'山顶音乐灯光秀', type:'show' },
+    { time:'全天', icon:'🌿', text:'城市绿化升级计划进行', type:'green' },
+  ];
+  list.innerHTML = events.map(e => `
+    <div class="schedule-item">
+      <span class="schedule-time">${e.time}</span>
+      <span style="font-size:20px">${e.icon}</span>
+      <span>${e.text}</span>
+    </div>
+  `).join('');
+}
+
+function applyForMayor() {
+  if (state.player.mayorCooldown > 0) {
+    notify('需要等待冷却时间结束！', 'warning', '⏳');
+    return;
+  }
+  if (state.player.hkt < 200) {
+    notify('申请市长需要 200 HKT！', 'error', '❌');
+    return;
+  }
+  state.player.hkt -= 200;
+  state.city.mayor = state.player.name;
+  state.city.mayorSince = Date.now();
+  state.player.mayorCooldown = 72 * 3600000; // 72h
+  state.transactions.push({ asset: 'mayor', type: 'buy', kind: 'mayor', amount: 1, price: 200, time: new Date().toLocaleString() });
+  addXP(150);
+  saveState();
+  updateUI();
+  renderMayor();
+  spawnParticles('multicolor');
+  notify('🎖️ 您已成为友好市长！享受一天的领导权！', 'success', '🏛️');
+  
+  // Auto end mayor after 1 minute (demo)
+  setTimeout(() => {
+    if (state.city.mayor === state.player.name) {
+      state.city.mayor = 'System';
+      notify('市长任职结束。感谢您为城市服务！', 'info', '👋');
+      saveState();
+    }
+  }, 60000);
+}
+
+function mayorAction(action) {
+  if (state.city.mayor !== state.player.name) {
+    notify('您目前不是市长，无法执行此操作！', 'warning', '⚠️');
+    return;
+  }
+  const costs = { distribute: 300, event: 500, green: 200, tax: 100 };
+  const cost = costs[action] || 100;
+  if (state.player.hkt < cost) {
+    notify(`需要 ${cost} HKT！余额不足。`, 'error', '❌');
+    return;
+  }
+  state.player.hkt -= cost;
+  
+  switch(action) {
+    case 'distribute':
+      notify('🎁 全市市民福利已发放！每人获得 150 HKT', 'success', '🎁');
+      state.city.gdp += 500;
+      break;
+    case 'event':
+      notify('🎪 文化节举办成功！城市GDP +1500，游客增加！', 'success', '🎪');
+      state.city.gdp += 1500;
+      state.city.events += 2;
+      break;
+    case 'green':
+      state.city.green = Math.min(100, state.city.green + 5);
+      notify('🌳 城市绿化提升！绿化率 +5%，城市更宜居！', 'success', '🌳');
+      state.city.gdp += 300;
+      break;
+    case 'tax':
+      notify('📉 税收调整完成！商业活力提升，GDP +800', 'success', '📉');
+      state.city.gdp += 800;
+      break;
+  }
+  addXP(80);
+  saveState();
+  updateUI();
+  renderMayor();
+  spawnParticles('green');
+}
+
+// ==================== PROFILE ====================
+function renderProfile() {
+  const { player, owned, shares } = state;
+  document.getElementById('profile-name').textContent = player.name;
+  document.getElementById('profile-id').textContent = `ID: #${state.nextId} · 加入于 2026-05-27`;
+  const titleIdx = Math.min(Math.floor(player.level / 3), USER_TITLES.length - 1);
+  document.getElementById('profile-titles').textContent = USER_TITLES[titleIdx];
+  
+  // Stats
+  document.getElementById('profile-stats').innerHTML = [
+    { icon:'💰', label:'总资产', val: formatNum(player.hkt + player.hkd) + ' HKT' },
+    { icon:'🏛️', label:'资产数', val: owned.length + ' 个' },
+    { icon:'📈', label:'持股数', val: Object.values(shares).reduce((s,v)=>s+v,0) + ' 股' },
+    { icon:'📊', label:'交易次数', val: state.transactions.length + ' 次' },
+    { icon:'⭐', label:'等级', val: player.level + ' (Lv)' },
+  ].map(s => `
+    <div class="profile-stat">
+      <div style="font-size:24px;margin-bottom:6px">${s.icon}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700">${s.val}</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px">${s.label}</div>
+    </div>
+  `).join('');
+  
+  // Assets
+  document.getElementById('asset-grid').innerHTML = owned.length ? owned.map(a => {
+    const lm = LANDMARKS.find(l => l.id === a.id);
+    return `
+      <div class="asset-item">
+        <div class="asset-item-icon">${lm?.icon || '🏛️'}</div>
+        <div class="asset-item-name">${a.name}</div>
+        <div class="asset-item-shares">购入价 ${formatNum(a.price)} HKT</div>
+      </div>
+    `;
+  }).join('') : '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px">还没有购买任何资产</div>';
+  
+  // Shares
+  const sharesList = Object.entries(shares).filter(([k,v]) => v > 0);
+  document.getElementById('shares-grid').innerHTML = sharesList.length ? sharesList.map(([id, amt]) => {
+    const lm = LANDMARKS.find(l => l.id === id);
+    return `
+      <div class="asset-item">
+        <div class="asset-item-icon">${lm?.icon || '📊'}</div>
+        <div class="asset-item-name">${lm?.name || id}</div>
+        <div class="asset-item-shares">持有 ${amt} 股</div>
+      </div>
+    `;
+  }).join('') : '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px">还没有持有任何股份</div>';
+  
+  // History
+  const recent = state.transactions.slice(-10).reverse();
+  document.getElementById('history-list').innerHTML = recent.length ? recent.map(t => {
+    const lm = LANDMARKS.find(l => l.id === t.asset);
+    return `
+      <div class="history-item">
+        <span class="history-icon">${t.type === 'buy' ? '📈' : t.kind === 'mayor' ? '🎖️' : '📉'}</span>
+        <div>
+          <div style="font-weight:600">${t.type === 'buy' ? '买入' : '卖出'} ${t.kind === 'asset' ? '资产' : t.kind === 'share' ? '股份' : '市长申请'}</div>
+          <div style="color:var(--text-dim);font-size:11px">${lm?.name || t.asset} · ${t.amount} × ${formatNum(t.price)} HKT</div>
+        </div>
+        <div style="margin-left:auto;color:var(--text-dim);font-size:11px">${t.time}</div>
+      </div>
+    `;
+  }).join('') : '<div style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px">暂无交易记录</div>';
+}
+
+// ==================== XP SYSTEM ====================
+function addXP(amount) {
+  const xpNeeded = state.player.level * 200;
+  state.player.xp += amount;
+  while (state.player.xp >= xpNeeded) {
+    state.player.xp -= xpNeeded;
+    state.player.level++;
+    notify(`🎊 升级！您现在是 Lv.${state.player.level}！`, 'success', '⭐');
+    spawnParticles('gold');
+  }
+}
+
+// ==================== UI UPDATE ====================
+function updateUI() {
+  document.getElementById('hkt-balance').textContent = formatNum(state.player.hkt);
+  document.getElementById('hkd-balance').textContent = formatNum(state.player.hkd);
+  document.getElementById('player-level').textContent = state.player.level;
+  const xpNeeded = state.player.level * 200;
+  document.getElementById('xp-fill').style.width = (state.player.xp / xpNeeded * 100) + '%';
+}
+
+// ==================== PARTICLES ====================
+function spawnParticles(type='gold') {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = type === 'gold' ? ['#FFE600','#C8102E','#FF8C00'] :
+                 type === 'cyan' ? ['#00E5FF','#0F4C75'] :
+                 type === 'green' ? ['#00D26A','#00E5FF'] :
+                 ['#FFE600','#C8102E','#00E5FF','#FF006E'];
+  
+  let particles = [];
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8 - 2,
+      life: 60 + Math.random() * 40,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 3 + Math.random() * 5,
+    });
+  }
+  
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
+      ctx.globalAlpha = p.life / 100;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      if (p.life <= 0) particles.splice(i, 1);
+    });
+    if (particles.length) requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// ==================== UTILITY ====================
+function formatNum(n) {
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+// ==================== DAILY DIVIDENDS ====================
+function processDividends() {
+  Object.entries(state.shares).forEach(([id, amt]) => {
+    if (amt > 0) {
+      const lm = LANDMARKS.find(l => l.id === id);
+      if (lm) {
+        const daily = Math.round(amt * lm.dividend / 100);
+        if (daily > 0) {
+          state.player.hkt += daily;
+          state.player.hkd += Math.round(daily * 0.1);
+        }
+      }
+    }
+  });
+  Object.entries(state.owned).forEach(({ id }) => {
+    const lm = LANDMARKS.find(l => l.id === id);
+    if (lm) state.player.hkt += Math.round(lm.gdp * 0.5);
+  });
+}
+
+function startDividends() {
+  setInterval(() => {
+    processDividends();
+    updateUI();
+  }, 30000); // Every 30s demo (would be daily in real game)
+}
+
+// ==================== INIT ====================
+function init() {
+  loadState();
+  updateUI();
+  renderMap();
+  
+  // Cooldown timer
+  setInterval(() => {
+    if (state.player.mayorCooldown > 0) {
+      state.player.mayorCooldown -= 1000;
+      if (state.player.mayorCooldown <= 0) state.player.mayorCooldown = 0;
+      saveState();
+    }
+  }, 1000);
+  
+  // GDP tick
+  setInterval(() => {
+    state.city.gdp += Math.floor(Math.random() * 50);
+    saveState();
+  }, 10000);
+  
+  startDividends();
+  
+  // Welcome
+  if (state.transactions.length === 0) {
+    setTimeout(() => notify('🏙️ 欢迎来到香港 Wonderland！您有 1000 HKT 开始探索这座虚拟城市！', 'info', '🌊'), 500);
+  }
+  
+  // Close modal on overlay click
+  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
